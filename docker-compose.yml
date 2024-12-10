@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # Servicio para la aplicación PHP
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: php-app
+    ports:
+      - "8080:80" # Mapea el puerto 80 del contenedor al puerto 8080 del host
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: crud-prueba
+      DB_USER: postgres
+      DB_PASSWORD: post123
+    depends_on:
+      - postgres # Asegura que el servicio 'postgres' se inicie antes que 'app'
+    networks:
+      - app-network
+
+  # Servicio para PostgreSQL
+  postgres:
+    image: postgres:latest
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: post123
+      POSTGRES_DB: crud-prueba
+    volumes:
+      - postgres-data:/var/lib/postgresql/data # Persistencia de datos en la base de datos
+    ports:
+      - "5432:5432" # Exposición del puerto de PostgreSQL
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge # Red puente para la comunicación entre servici
+
+volumes:
+  postgres-data:
+
